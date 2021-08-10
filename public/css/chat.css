@@ -9,7 +9,11 @@ body {
 
 .chat_body {
   margin-left: 1em;
+  position: relative;
   color: white;
+  margin-bottom: 2em;
+  overflow-y: scroll;
+  overflow-x: hidden;
   font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 .chat_body * + * {
@@ -151,6 +155,33 @@ body {
 }
 .login_box .passwrd {
   margin-top: 1em;
+}
+
+.message_div {
+  position: fixed;
+  bottom: 1em;
+  right: 0.5em;
+  left: 0.5em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1em;
+}
+.message_div .message_input {
+  background-color: lightgreen;
+  border: none;
+  outline: none;
+  padding: 0.4em;
+  width: 100%;
+  color: black;
+  border-radius: 0.3em;
+}
+.message_div .icon {
+  padding: 0.25em;
+  background-color: lightgreen;
+  border-radius: 0.2em;
+  margin-left: 0.15em;
+  color: #112445;
 }
 
 /*# sourceMappingURL=chat.css.map */

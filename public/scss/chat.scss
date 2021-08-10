@@ -17,7 +17,11 @@ body{
 
 .chat_body {
     margin-left: 1em;
+    position: relative;
     color: $text-color;
+    margin-bottom: 2em;
+    overflow-y: scroll;
+    overflow-x: hidden;
     * + * {
         margin-top: 12px;
     }
@@ -164,5 +168,32 @@ body{
     }
     .passwrd{
         margin-top: 1em;
+    }
+}
+
+.message_div{
+    position:fixed;
+    bottom: 1em;
+    right: 0.5em;
+    left: 0.5em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1em;
+    .message_input{
+        background-color: lightgreen;
+        border: none;
+        outline: none;
+        padding: 0.4em;
+        width: 100%;
+        color: rgb(0, 0, 0);
+        border-radius: 0.3em;
+    }
+    .icon{
+        padding: 0.25em;
+        background-color: lightgreen;
+        border-radius: 0.2em;
+        margin-left: 0.15em;
+        color: $primary-color;
     }
 }

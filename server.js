@@ -7,6 +7,8 @@ const { MongoClient } = require("mongodb");
 const bodyParser = require("body-parser");
 const session = require("express-session");
 const { doesNotMatch } = require("assert");
+const socketio = require("socket.io");
+const io = socketio(server);
 
 
 const session_name = "sid1"
@@ -25,13 +27,25 @@ app.use(session({
     }
 }));
 
+
+
+// ........................Middlewares-for-Processing-Client-Connections......................................
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
+// #############################################################################################################
 
-//connectin to the mongodb database.....
+
+// >>>>>>>>................Setting-Up-Socket.io-For-Chat-Messages...................>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+io.on("connection",(socket) =>{
+    console.log("New socket connection");
+});
+// ......................................................................................................
+
+
+//connectin to the mongodb database...............................................................
 const uri = "mongodb://localhost:27017";
 const client = new MongoClient(uri);
-
+// ...............................................................................................
 
 
 // ..................................Functions-for-Database-connection..........................................................
@@ -63,7 +77,7 @@ connectingDatabase()
 //.............................................................................................................
 
 
-
+// ...........................ROUTING-TAKES-PLACE-HERE.........................................................
 app.get("/",(req,res)=> {
     res.sendFile("./views/index.html",{root: __dirname});
 });
@@ -97,7 +111,7 @@ app.post("/submit-user",(req,res)=>{
     req.session.userName = creds.username;
     res.redirect(301,"/messages");
 });
-
+// ...............................................................................................................
 
 
 server.listen(port,() =>{
