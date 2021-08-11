@@ -159,16 +159,18 @@ body {
 
 .message_div {
   position: fixed;
-  bottom: 1em;
+  bottom: 0.3em;
   right: 0.5em;
   left: 0.5em;
   display: flex;
+  margin-bottom: 0;
   align-items: center;
   justify-content: center;
   margin-right: 1em;
 }
 .message_div .message_input {
   background-color: lightgreen;
+  margin: 0;
   border: none;
   outline: none;
   padding: 0.4em;

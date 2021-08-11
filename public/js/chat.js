@@ -1,5 +1,5 @@
 const socket = io();
-const username = "bill";
+const username = localStorage.getItem('username');
 const chatBox = document.getElementById('chat-box');
 
 var sendBtn = document.getElementById('send-message');
@@ -9,19 +9,34 @@ socket.on("serveMessage",(message) => {
     chatBox.scrollTop = chatBox.scrollHeight;
     console.log("User list: " + userList);
     if(userList.length == 0){
+       if(message.user_name == username){
         userList.push(message.user_name);
         displayMessage(message);
         console.log(userList)
-    }else if(userList[userList.length - 1] === message.user_name){
+       } else{
+            displayOtherUserMessage(message);
+            userList.push(message.user_name);
+            console.log(userList);
+       }
+    }else if((userList[userList.length - 1] === message.user_name) && (message.user_name == username)){
         displayNextMessage(message);
         console.log(userList[userList.length - 1]);
+    }
+    else if((userList[userList.length - 1] != message.user_name) && (message.user_name != username)){
+        displayOtherUserMessage(message);
+        userList.push(message.user_name);
+        console.log(userList);
+    }
+    else if((userList[userList.length -1] == message.user_name) && (message.user_name != username)){
+        displayNextOtherUserMessage(message);
     }
 })
 
 sendBtn.addEventListener('click',() =>{
-    var messageToSend = messageInput.value;
+    var messageToSend = messageInput.innerText;
    // console.log(messageToSend);
     sendUserMes(messageToSend);
+    messageInput.innerText = "";
 })
 
 
@@ -29,7 +44,7 @@ sendBtn.addEventListener('click',() =>{
 function sendUserMes(message) {
     var timeOfSending = new Date().toLocaleTimeString().replace(/(?!:\d\d:)(:\d\d)/,"");
     var userMessage = {
-        user_name: "bill",
+        user_name: username,
         message,
         time: timeOfSending
     };
@@ -38,7 +53,6 @@ function sendUserMes(message) {
 }
 
 function displayMessage(message){
-    if(message.user_name == username){
         var newDiv = document.createElement('div')
         newDiv.classList.add('message');
         newDiv.innerHTML = `<div class="user_details">
@@ -49,8 +63,7 @@ function displayMessage(message){
         <p>${message.message}</p>
         </div>`
         chatBox.appendChild(newDiv);
-    }
-   
+        console.log("form displayMessage");
 }
 
 function displayNextMessage(message) {
@@ -63,4 +76,33 @@ function displayNextMessage(message) {
     <p>${message.message}</p>
      `;
     chatBox.appendChild(newDiv);
+    console.log("from dispalyNextMessage");
+}
+
+function displayOtherUserMessage(message){
+    var newDiv = document.createElement('div');
+    newDiv.classList.add('other_user');
+    newDiv.innerHTML = `
+    <div class="user_details">
+                <img src="/images/ava.svg" alt="avatar" />
+                <span>${message.user_name}</span>
+                <span class="time">${message.time}</span>
+            </div>
+            <p>${message.message}</p>
+    `;
+    chatBox.appendChild(newDiv);
+    console.log("from displayOtherUserMessage");
+}
+
+function displayNextOtherUserMessage(message){
+    var newDiv = document.createElement('div');
+    newDiv.classList.add('other_next_message');
+    newDiv.innerHTML = `
+    <div class="time_box">
+    <span class="time">${message.time}</span>
+</div>
+<p>${message.message}</p>
+    `;
+    chatBox.appendChild(newDiv);
+    console.log("from displayNextOtherUserMessage");
 }

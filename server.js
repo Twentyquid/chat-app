@@ -88,7 +88,8 @@ app.get("/",(req,res)=> {
     res.sendFile("./views/index.html",{root: __dirname});
 });
 
-app.get("/messages",(req,res)=>{
+app.get("/messages/:name",(req,res)=>{
+    console.log(req.params['name']);
     // console.log("user session " + req.session.userName)
     // if(req.session.userName){
     res.sendFile("./views/messages.html",{root: __dirname});
@@ -114,8 +115,7 @@ app.post("/submit-user",(req,res)=>{
         ip_addr: req.ip
     };
     // console.log(userCreds);
-    req.session.userName = creds.username;
-    res.redirect(301,"/messages");
+    res.redirect(301,`/messages/${creds.username}`);
 });
 // ...............................................................................................................
 

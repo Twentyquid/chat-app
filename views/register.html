@@ -12,10 +12,10 @@
     <div class="container">
         <div class="login_box">
             <div class="details">Details</div>
-            <form action="/submit-user" method="post">
+            <form id="user-form" action="/submit-user" method="post">
                 <div class="name">
                 <label for="username">Enter Your Name:</label>
-                <input placeholder="Name" required type="text" name="username" id="username">
+                <input  placeholder="Name" required type="text" name="username" id="username">
                 </div>
                 <div class="email">
                 <label for="useremail">Enter Email:</label>
@@ -26,10 +26,21 @@
                     <input placeholder="Password" type="password" name="password" id="password">
                 </div>
                 <div class="submit">
-                    <input type="submit" value="Register">
+                    <input id="submit-button" type="submit" value="Register">
                 </div>
             </form>
         </div>
     </div>
+    <script>
+        var submitBtn = document.getElementById('submit-button');
+        var form = document.getElementById('user-form');
+        submitBtn.addEventListener('click',(e) =>{
+            e.preventDefault();
+            let usernameInput = document.getElementById('username');
+            let username = usernameInput.value;
+            localStorage.setItem('username',username);
+            form.submit();
+        });
+    </script>
 </body>
 </html>
