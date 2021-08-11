@@ -19,7 +19,7 @@ body{
     margin-left: 1em;
     position: relative;
     color: $text-color;
-    margin-bottom: 2em;
+    margin-bottom: 3em;
     overflow-y: scroll;
     overflow-x: hidden;
     * + * {
@@ -195,5 +195,7 @@ body{
         border-radius: 0.2em;
         margin-left: 0.15em;
         color: $primary-color;
+    } i{
+        pointer-events: none;
     }
 }

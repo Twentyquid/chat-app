@@ -15,7 +15,7 @@ const session_name = "sid1"
 
 
 app.use(express.static(__dirname + '/public'));
-app.use(session({
+/* app.use(session({
     name: session_name,
     resave: false,
     saveUninitialized: false,
@@ -25,7 +25,7 @@ app.use(session({
         sameSite: true,
         secure: false
     }
-}));
+})); */
 
 
 
@@ -38,6 +38,12 @@ app.use(bodyParser.json());
 // >>>>>>>>................Setting-Up-Socket.io-For-Chat-Messages...................>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 io.on("connection",(socket) =>{
     console.log("New socket connection");
+    socket.on("message",(message) =>{
+        console.log("user name " + message.user_name);
+        console.log("message " + message.message);
+        console.log("time of sending " + message.time);
+        io.emit("serveMessage",message);
+    })
 });
 // ......................................................................................................
 
@@ -83,12 +89,12 @@ app.get("/",(req,res)=> {
 });
 
 app.get("/messages",(req,res)=>{
-    console.log("user session " + req.session.userName)
-    if(req.session.userName){
+    // console.log("user session " + req.session.userName)
+    // if(req.session.userName){
     res.sendFile("./views/messages.html",{root: __dirname});
-    }else{
-        res.redirect(301,"/login");
-    }
+   // }else{
+       // res.redirect(301,"/login");
+    //}
 });
 
 app.get("/login",(req,res)=>{

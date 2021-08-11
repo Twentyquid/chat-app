@@ -9,7 +9,7 @@
     <title>Document</title>
 </head>
 <body>
-    <div class="chat_body">
+    <div id="chat-box" class="chat_body">
         <div class="message">
             <div class="user_details">
                 <img src="/images/avatar1.svg" alt="avatar" />
@@ -46,7 +46,7 @@
     </div>
     <div class="message_div">
         <input class="message_input" type="text"  id="message-item">
-        <span class="icon"><i class="fas fa-paper-plane"></i></span>
+        <span id="send-message" class="icon"><i class="fas fa-paper-plane"></i></span>
     </div>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/js/chat.js"></script>
