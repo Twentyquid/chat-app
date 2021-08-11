@@ -3,3 +3,4 @@ node_modules
 *.seed
 coverage
 build
+ngrok.exe
