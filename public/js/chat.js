@@ -6,41 +6,46 @@ var sendBtn = document.getElementById('send-message');
 var messageInput = document.getElementById('message-item');
 var userList = [];
 socket.on("serveMessage",(message) => {
-    chatBox.scrollTop = chatBox.scrollHeight;
-    console.log("User list: " + userList);
-    if(userList.length == 0){
-        console.log("userList is empty");
-       if(message.user_name == username){
-           console.log("user name is the user's name")
-           console.log("funtion: displayMessage")
-        userList.push(message.user_name);
-        displayMessage(message);
-        console.log(userList)
-       } else{
-           console.log("username is not the user's name" + message.user_name);
+    scollBox();
+    if(message.message != ""){
+        if(message.message.trim() != ""){
+        chatBox.scrollTop = chatBox.scrollHeight;
+        console.log("User list: " + userList);
+        if(userList.length == 0){
+            console.log("userList is empty");
+        if(message.user_name == username){
+            console.log("user name is the user's name")
+            console.log("funtion: displayMessage")
+            userList.push(message.user_name);
+            displayMessage(message);
+            console.log(userList)
+        } else{
+            console.log("username is not the user's name" + message.user_name);
+                displayOtherUserMessage(message);
+                userList.push(message.user_name);
+                console.log(userList);
+        }
+        }else if((userList[userList.length - 1] == message.user_name) && (message.user_name == username)){
+            console.log("funtion displayNextMessage");
+            displayNextMessage(message);
+            console.log(userList[userList.length - 1]);
+        }
+        else if((userList[userList.length - 1] != message.user_name) && (message.user_name != username)){
+            console.log("function: displayOtherUserMessage");
             displayOtherUserMessage(message);
             userList.push(message.user_name);
             console.log(userList);
-       }
-    }else if((userList[userList.length - 1] == message.user_name) && (message.user_name == username)){
-        console.log("funtion displayNextMessage");
-        displayNextMessage(message);
-        console.log(userList[userList.length - 1]);
+        }
+        else if((userList[userList.length -1] == message.user_name) && (message.user_name != username)){
+            console.log("function: displayNextOtherUserMessage");
+            displayNextOtherUserMessage(message);
+        }else if(userList[userList.length - 1] != message.user_name && message.user_name == username){
+            console.log("function: displayMessage")
+            displayMessage(message);
+            userList.push(message.user_name);
+        }
     }
-    else if((userList[userList.length - 1] != message.user_name) && (message.user_name != username)){
-        console.log("function: displayOtherUserMessage");
-        displayOtherUserMessage(message);
-        userList.push(message.user_name);
-        console.log(userList);
-    }
-    else if((userList[userList.length -1] == message.user_name) && (message.user_name != username)){
-        console.log("function: displayNextOtherUserMessage");
-        displayNextOtherUserMessage(message);
-    }else if(userList[userList.length - 1] != message.user_name && message.user_name == username){
-        console.log("function: displayMessage")
-        displayMessage(message);
-        userList.push(message.user_name);
-    }
+}
 })
 
 sendBtn.addEventListener('click',() =>{
@@ -116,4 +121,9 @@ function displayNextMessage(message){
     `;
     chatBox.appendChild(newDiv);
     console.log("from displayNextMessage");
+}
+
+function scollBox(){
+    console.log("Inside scroll function");
+    chatBox.scrollTop = chatBox.scrollHeight;
 }

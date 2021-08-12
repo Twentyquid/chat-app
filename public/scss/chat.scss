@@ -13,15 +13,14 @@ $text-color: white;
 body{
     background-color: $primary-color;
     color: $text-color;
+    min-height: 100vh;
 }
 
 .chat_body {
     margin-left: 1em;
-    position: relative;
     color: $text-color;
-    margin-bottom: 3em;
     overflow-y: scroll;
-    overflow-x: hidden;
+    margin-bottom: 10vh;
     * + * {
         margin-top: 12px;
     }
@@ -31,7 +30,6 @@ body{
 .message{
     padding: 0.5em;
     background-color: $secondary-color;
-    position: relative;
     min-width: 40vw;
     margin-right: 30vw;
     border-radius: 0.5em;
@@ -48,7 +46,6 @@ body{
     margin-top: -4px;
     padding: 0.5em;
     background-color: $secondary-color;
-    position: relative;
     min-width: 40vw;
     margin-right: 30vw;
     clip-path: polygon(100% 0%, 100% 100%, calc(2% + 1vh) 100%, calc(2% + 1vh) 0);
@@ -173,7 +170,8 @@ body{
 
 .message_div{
     position:fixed;
-    bottom: 0.3em;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    bottom: 0.7em;
     right: 0.5em;
     left: 0.5em;
     display: flex;
