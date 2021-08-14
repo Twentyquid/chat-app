@@ -8,6 +8,7 @@ const bodyParser = require("body-parser");
 const session = require("express-session");
 const { doesNotMatch } = require("assert");
 const socketio = require("socket.io");
+const cookieParser = require("cookie-parser");
 const io = socketio(server);
 
 
@@ -32,24 +33,33 @@ app.use(express.static(__dirname + '/public'));
 // ........................Middlewares-for-Processing-Client-Connections......................................
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
+app.use(cookieParser());
 // #############################################################################################################
 
 
 // >>>>>>>>................Setting-Up-Socket.io-For-Chat-Messages...................>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 io.on("connection",(socket) =>{
     console.log("New socket connection");
+    var initialMessage = {user_name: "Server",
+    time:"",message:"Someone joined the chat"}
+    socket.broadcast.emit("message",initialMessage);
     socket.on("message",(message) =>{
         console.log("user name " + message.user_name);
         console.log("message " + message.message);
         console.log("time of sending " + message.time);
         io.emit("serveMessage",message);
-    })
+    });
+    var disconMessage = {user_name:"Server",
+    time:"", message:"Someone disconnected"};
+    socket.on("disconnect",() => {
+        io.emit("message",disconMessage);
+    });
 });
 // ......................................................................................................
 
 
 //connectin to the mongodb database...............................................................
-const uri = "mongodb://localhost:27017";
+const uri = "mongodb+srv://repl_app_admin:repl080102@cluster0.dygxb.mongodb.net/test";
 const client = new MongoClient(uri);
 // ...............................................................................................
 
@@ -58,8 +68,8 @@ const client = new MongoClient(uri);
 async function connectingDatabase(){
     await client.connect();
     console.log("connected successfully to the server");
-    const collection = client.db("app_users").collection("details");
-    const result = await collection.find().project({ username: 1, password: 1 }).toArray();
+    const collection = client.db("appusers").collection("user_details");
+    const result = await collection.find().project({ username: 1, password: 1, rooms:1 }).toArray();
     return result;
 }
 
@@ -76,10 +86,10 @@ async function addItemsToDatabase(item){
 
 
 // database connection and querying.............................................................................
-connectingDatabase()
+/* connectingDatabase()
 .then(console.log)
 .catch(console.log)
-.finally(() => client.close());
+.finally(() => client.close()); */
 //.............................................................................................................
 
 
@@ -88,8 +98,9 @@ app.get("/",(req,res)=> {
     res.sendFile("./views/index.html",{root: __dirname});
 });
 
-app.get("/messages/:name",(req,res)=>{
-    console.log(req.params['name']);
+app.get("/messages",(req,res)=>{
+    // console.log(req.params['name']);
+    console.log(req.cookies.username);
     // console.log("user session " + req.session.userName)
     // if(req.session.userName){
     res.sendFile("./views/messages.html",{root: __dirname});
@@ -103,8 +114,21 @@ app.get("/login",(req,res)=>{
 });
 
 app.get("/register",(req,res)=>{
+   // console.log(req.cookies);
     res.sendFile("./views/register.html",{root: __dirname});
 });
+
+app.get("/rooms",(req,res) => {
+    res.sendFile("./views/roomjoin.html",{root: __dirname});
+});
+
+app.post("/room",(req,res) => {
+    console.log(req.body);
+    var groups = req.body
+    res.cookie("roomname", groups.groupnames,{maxAge: 2592000000});
+    var cookieUser = req.cookies.username;
+    res.redirect(301,`/messages?name=${cookieUser}&group=${groups.groupnames}`);
+})
 
 app.post("/submit-user",(req,res)=>{
     var creds = req.body;
@@ -115,7 +139,8 @@ app.post("/submit-user",(req,res)=>{
         ip_addr: req.ip
     };
     // console.log(userCreds);
-    res.redirect(301,`/messages/${creds.username}`);
+    res.cookie("username",creds.username,{maxAge: 2592000000});
+    res.redirect(301,`/rooms`);
 });
 // ...............................................................................................................
 

@@ -168,6 +168,14 @@ body{
     }
 }
 
+.custom_select{
+    background-color: lightgreen;
+    color: $primary-color;
+    padding: 0.5em;
+    border-radius: 0.2em;
+    border: 0;
+}
+
 .message_div{
     position:fixed;
     font-family: Verdana, Geneva, Tahoma, sans-serif;

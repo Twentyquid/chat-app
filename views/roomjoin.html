@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/chat.css">
+    <title>Join Rooms</title>
+</head>
+<body>
+    <h1>Join Rooms</h1>
+    <div class="container">
+        <div class="login_box">
+            <div class="details">Details</div>
+            <form action="/room" method="post">
+                <div class="name">
+                <label for="groupName">Choose Your Group:</label>
+                <select class="custom_select" required id="groupName" name="groupnames">
+                    <option value="cousins">Cousins</option>
+                    <option value="friends">Friends</option>
+                    <option value="gentlemen">G3ntl3m3n</option>
+                </select>
+                </div>
+                <div class="passwrd">
+                    <label for="password">Enter Group Password</label>
+                    <input required placeholder="Password" type="password" name="password" id="password">
+                </div>
+                <div class="submit">
+                    <input type="submit" value="Enter Group">
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

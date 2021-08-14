@@ -9,6 +9,7 @@
   "author": "twentyquid",
   "license": "ISC",
   "dependencies": {
+    "cookie-parser": "^1.4.5",
     "express": "^4.17.1",
     "express-session": "^1.17.2",
     "mongodb": "^4.1.0",
