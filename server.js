@@ -10,9 +10,9 @@ const { doesNotMatch } = require("assert");
 const socketio = require("socket.io");
 const cookieParser = require("cookie-parser");
 const io = socketio(server);
+const secret = require("./secrets");
 
 
-const session_name = "sid1"
 
 
 app.use(express.static(__dirname + '/public'));
@@ -42,11 +42,10 @@ io.on("connection",(socket) =>{
     console.log("New socket connection");
     var initialMessage = {user_name: "Server",
     time:"",message:"Someone joined the chat"}
-    socket.broadcast.emit("message",initialMessage);
+    socket.broadcast.emit("initialmessage",initialMessage);
     socket.on("message",(message) =>{
-        console.log("user name " + message.user_name);
-        console.log("message " + message.message);
-        console.log("time of sending " + message.time);
+        var presenttime = new Date().toLocaleTimeString().replace(/(?!:\d\d:)(:\d\d)/,"");
+        message.time = presenttime;
         io.emit("serveMessage",message);
     });
     var disconMessage = {user_name:"Server",
@@ -59,24 +58,30 @@ io.on("connection",(socket) =>{
 
 
 //connectin to the mongodb database...............................................................
-const uri = "mongodb+srv://repl_app_admin:repl080102@cluster0.dygxb.mongodb.net/test";
+const uri = secret.serverUrl; // Use your own database..
+
 const client = new MongoClient(uri);
 // ...............................................................................................
 
 
 // ..................................Functions-for-Database-connection..........................................................
-async function connectingDatabase(){
+async function connectingDatabase(collectionName,query,projection){
     await client.connect();
     console.log("connected successfully to the server");
-    const collection = client.db("appusers").collection("user_details");
-    const result = await collection.find().project({ username: 1, password: 1, rooms:1 }).toArray();
+    const collection = client.db("appusers").collection(collectionName);
+    if(projection){
+    const result = await collection.find(query).project(projection).toArray();
     return result;
+    } else{
+        const result = await collection.find(query).toArray();
+    return result;
+    }
 }
 
 async function addItemsToDatabase(item){
     await client.connect();
     console.log("Connected to database for adding items");
-    const collection = client.db("app_users").collection("details");
+    const collection = client.db("appusers").collection("user_details");
     const result = await collection.insertOne(item);
     return result;
 }
@@ -125,10 +130,25 @@ app.get("/rooms",(req,res) => {
 app.post("/room",(req,res) => {
     console.log(req.body);
     var groups = req.body
-    res.cookie("roomname", groups.groupnames,{maxAge: 2592000000});
-    var cookieUser = req.cookies.username;
-    res.redirect(301,`/messages?name=${cookieUser}&group=${groups.groupnames}`);
-})
+    var password = groups.password;
+    connectingDatabase("room_details",{name: groups.groupnames},{password:1})
+    .then((result) => {
+        console.log(result);
+        if(result[0] != undefined){
+            result.forEach((item) => {
+                if(item.password === password){
+                    res.cookie("roomname", groups.groupnames,{maxAge: 2592000000});
+                    var cookieUser = req.cookies.username;
+                    res.redirect(301,`/messages?username=${cookieUser}&group=${groups.groupnames}`);
+                }else{
+                    res.redirect(301,"/rooms");
+                }
+            })
+        }else{
+            res.redirect(301,"/login");
+        }
+    }).catch(console.log).finally(() => client.close());
+});
 
 app.post("/submit-user",(req,res)=>{
     var creds = req.body;
@@ -139,8 +159,34 @@ app.post("/submit-user",(req,res)=>{
         ip_addr: req.ip
     };
     // console.log(userCreds);
+    addItemsToDatabase(userCreds).then(console.log).catch(console.log).finally(() => client.close());
     res.cookie("username",creds.username,{maxAge: 2592000000});
     res.redirect(301,`/rooms`);
+});
+
+app.post("/confirm-user",(req,res) => {
+    var username = req.body.username;
+    var password = req.body.password;
+    connectingDatabase("user_details",{username: username},{password:1})
+    .then(result => {
+        console.log(result);
+        if(result[0] != undefined){
+        result.forEach((item) => {
+        if(item.password === password){
+            res.cookie("username",username,{maxAge: 2592000000});
+            res.redirect(301,"/rooms");
+        }else{
+            res.redirect(301,"/login");
+        }
+    })}else{
+        res.redirect(301,"/register");
+    }
+}).catch(console.log);
+});
+
+app.get("/logout",(req, res) => {
+    res.clearCookie('username','roomname');
+    res.redirect(301,"/login");
 });
 // ...............................................................................................................
 

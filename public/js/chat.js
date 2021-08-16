@@ -1,13 +1,31 @@
 const socket = io();
-const username = localStorage.getItem('username');
 const chatBox = document.getElementById('chat-box');
 
 var sendBtn = document.getElementById('send-message');
 var messageInput = document.getElementById('message-item');
 console.log(location.search);
+
+var search = location.search;
+var modsearch = search.replace("?","");
+var firstlist = modsearch.split("&");
+var namelist = firstlist[0].split("=");
+var roomlist = firstlist[1].split("=");
+namelist.push(...roomlist);
+console.log(firstlist);
+console.log(roomlist);
+console.log(namelist);
+var someobject = {};
+for(i = 0; i < namelist.length; i++){
+    if(i % 2 === 0){
+        someobject[namelist[i]] = namelist[i + 1];
+    }
+}
+console.log(someobject);
+const username = someobject.username;
+const presentgroup = someobject.group;
+
 var userList = [];
 socket.on("serveMessage",(message) => {
-    scollBox();
     if(message.message != ""){
         if(message.message.trim() != ""){
         chatBox.scrollTop = chatBox.scrollHeight;
@@ -47,6 +65,7 @@ socket.on("serveMessage",(message) => {
         }
     }
 }
+scollBox();
 })
 
 sendBtn.addEventListener('click',() =>{
@@ -59,12 +78,12 @@ sendBtn.addEventListener('click',() =>{
 
 // ........................Functions-For-Script............................................
 function sendUserMes(message) {
-    var timeOfSending = new Date().toLocaleTimeString().replace(/(?!:\d\d:)(:\d\d)/,"");
     var userMessage = {
         user_name: username,
         message,
-        time: timeOfSending
+        group: presentgroup
     };
+    console.log(userMessage);
     socket.emit('message', userMessage);
 
 }
