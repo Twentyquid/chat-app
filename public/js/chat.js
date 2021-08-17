@@ -24,47 +24,25 @@ console.log(someobject);
 const username = someobject.username;
 const presentgroup = someobject.group;
 
+var cacheMessages = [];
+
 var userList = [];
+
+// load saved messages on document load..........
+window.addEventListener('load',showSavedMessages());
+
+
 socket.on("serveMessage",(message) => {
-    if(message.message != ""){
-        if(message.message.trim() != ""){
-        chatBox.scrollTop = chatBox.scrollHeight;
-     //   console.log("User list: " + userList);
-        if(userList.length == 0){
-            console.log("userList is empty");
-        if(message.user_name == username){
-        //    console.log("user name is the user's name")
-         //   console.log("funtion: displayMessage")
-            userList.push(message.user_name);
-            displayMessage(message);
-        //    console.log(userList)
-        } else{
-           // console.log("username is not the user's name" + message.user_name);
-                displayOtherUserMessage(message);
-                userList.push(message.user_name);
-            //    console.log(userList);
-        }
-        }else if((userList[userList.length - 1] == message.user_name) && (message.user_name == username)){
-         //   console.log("funtion displayNextMessage");
-            displayNextMessage(message);
-            console.log(userList[userList.length - 1]);
-        }
-        else if((userList[userList.length - 1] != message.user_name) && (message.user_name != username)){
-         //   console.log("function: displayOtherUserMessage");
-            displayOtherUserMessage(message);
-            userList.push(message.user_name);
-        //    console.log(userList);
-        }
-        else if((userList[userList.length -1] == message.user_name) && (message.user_name != username)){
-         //   console.log("function: displayNextOtherUserMessage");
-            displayNextOtherUserMessage(message);
-        }else if(userList[userList.length - 1] != message.user_name && message.user_name == username){
-        //    console.log("function: displayMessage")
-            displayMessage(message);
-            userList.push(message.user_name);
-        }
-    }
-}
+    cacheMessages.push(message);
+   addingMessages(message);
+   console.log("showing cached message when message comes: " + cacheMessages);
+   if(cacheMessages.length <= 10){
+        addToLocalStorage(cacheMessages);
+   }else{
+       cacheMessages.splice(0,1);
+       console.log("slpliced Message :" + cacheMessages);
+       addToLocalStorage(cacheMessages);
+   }
 scollBox();
 })
 
@@ -146,4 +124,70 @@ function displayNextMessage(message){
 function scollBox(){
  //   console.log("Inside scroll function");
     chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+function addingMessages(message) {
+    if(message.message != ""){
+        if(message.message.trim() != ""){
+        // chatBox.scrollTop = chatBox.scrollHeight;
+    //   console.log("User list: " + userList);
+        if(userList.length == 0){
+            console.log("userList is empty");
+        if(message.user_name == username){
+        //    console.log("user name is the user's name")
+        //   console.log("funtion: displayMessage")
+            userList.push(message.user_name);
+            displayMessage(message);
+        //    console.log(userList)
+        } else{
+        // console.log("username is not the user's name" + message.user_name);
+                displayOtherUserMessage(message);
+                userList.push(message.user_name);
+            //    console.log(userList);
+        }
+        }else if((userList[userList.length - 1] == message.user_name) && (message.user_name == username)){
+        //   console.log("funtion displayNextMessage");
+            displayNextMessage(message);
+            console.log(userList[userList.length - 1]);
+        }
+        else if((userList[userList.length - 1] != message.user_name) && (message.user_name != username)){
+        //   console.log("function: displayOtherUserMessage");
+            displayOtherUserMessage(message);
+            userList.push(message.user_name);
+        //    console.log(userList);
+        }
+        else if((userList[userList.length -1] == message.user_name) && (message.user_name != username)){
+        //   console.log("function: displayNextOtherUserMessage");
+            displayNextOtherUserMessage(message);
+        }else if(userList[userList.length - 1] != message.user_name && message.user_name == username){
+        //    console.log("function: displayMessage")
+            displayMessage(message);
+            userList.push(message.user_name);
+        }
+    }
+    }
+}
+
+function addToLocalStorage(item){
+    if (window.localStorage){
+        var jsonItem = JSON.stringify(item);
+        localStorage.setItem('cachedMessages',jsonItem);
+    }
+}
+
+function getItemFromLocalStorage(){
+    var finalItem = JSON.parse(localStorage.getItem('cachedMessages'));
+    cacheMessages = finalItem;
+    return finalItem;
+}
+
+function showSavedMessages(){
+    console.log("Inside showsaved Messages")
+    var messageItems = getItemFromLocalStorage();
+    console.log("message items in showsaved messages: " + messageItems);
+    if(messageItems){
+    messageItems.forEach(mesItem => {
+        addingMessages(mesItem);
+    })
+    }
 }
