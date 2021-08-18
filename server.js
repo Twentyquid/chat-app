@@ -40,14 +40,24 @@ app.use(cookieParser());
 // >>>>>>>>................Setting-Up-Socket.io-For-Chat-Messages...................>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 io.on("connection",(socket) =>{
     console.log("New socket connection");
-    var initialMessage = {user_name: "Server",
-    time:"",message:"Someone joined the chat"}
-    socket.broadcast.emit("initialmessage",initialMessage);
+    var presenttime = new Date().toLocaleTimeString().replace(/(?!:\d\d:)(:\d\d)/,"");
+   
+    socket.on("joinMessage",(message) =>{
+        console.log("Join message from client: " + message.message + message.group);
+        socket.join(message.group);
+        var initialMessage = {user_name: "Server",
+    time: presenttime ,message:`${message.user_name} joined the chat`}
+    console.log(initialMessage);
+    socket.broadcast.to(message.group).emit("initialmessage",initialMessage);
+    });
+
+
     socket.on("message",(message) =>{
         var presenttime = new Date().toLocaleTimeString().replace(/(?!:\d\d:)(:\d\d)/,"");
         message.time = presenttime;
-        io.emit("serveMessage",message);
+        io.to(message.group).emit("serveMessage",message);
     });
+
     var disconMessage = {user_name:"Server",
     time:"", message:"Someone disconnected"};
     socket.on("disconnect",() => {
@@ -105,6 +115,7 @@ app.get("/",(req,res)=> {
 
 app.get("/messages",(req,res)=>{
     // console.log(req.params['name']);
+    console.log(req.query);
     console.log(req.cookies.username);
     // console.log("user session " + req.session.userName)
     // if(req.session.userName){
@@ -190,10 +201,7 @@ app.get("/logout",(req, res) => {
 });
 // ...............................................................................................................
 
-
+// listening on port 5000.........................................
 server.listen(port,() =>{
     console.log(`server is running on port ${port}`);
 })
-
-
-//functions for conecting to the database.....

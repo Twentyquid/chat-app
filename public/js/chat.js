@@ -3,7 +3,7 @@ const chatBox = document.getElementById('chat-box');
 
 var sendBtn = document.getElementById('send-message');
 var messageInput = document.getElementById('message-item');
-console.log(location.search);
+// console.log(location.search);
 
 var search = location.search;
 var modsearch = search.replace("?","");
@@ -11,16 +11,16 @@ var firstlist = modsearch.split("&");
 var namelist = firstlist[0].split("=");
 var roomlist = firstlist[1].split("=");
 namelist.push(...roomlist);
-console.log(firstlist);
-console.log(roomlist);
-console.log(namelist);
+// console.log(firstlist);
+// console.log(roomlist);
+// console.log(namelist);
 var someobject = {};
 for(i = 0; i < namelist.length; i++){
     if(i % 2 === 0){
         someobject[namelist[i]] = namelist[i + 1];
     }
 }
-console.log(someobject);
+// console.log(someobject);
 const username = someobject.username;
 const presentgroup = someobject.group;
 
@@ -32,15 +32,24 @@ var userList = [];
 window.addEventListener('load',showSavedMessages());
 
 
+socket.emit("joinMessage",sendUserMes("user joined"));
+
+socket.on("initialmessage",(message) => {
+    console.log("Initialmessage received " + message );
+    addingMessages(message);
+    scollBox();
+})
+
 socket.on("serveMessage",(message) => {
+   // console.log("Message from server: " + message);
     cacheMessages.push(message);
    addingMessages(message);
-   console.log("showing cached message when message comes: " + cacheMessages);
+  // console.log("showing cached message when message comes: " + cacheMessages);
    if(cacheMessages.length <= 10){
         addToLocalStorage(cacheMessages);
    }else{
        cacheMessages.splice(0,1);
-       console.log("slpliced Message :" + cacheMessages);
+    //   console.log("slpliced Message :" + cacheMessages);
        addToLocalStorage(cacheMessages);
    }
 scollBox();
@@ -51,6 +60,8 @@ sendBtn.addEventListener('click',() =>{
    // console.log(messageToSend);
     sendUserMes(messageToSend);
     messageInput.innerText = "";
+    var messageForServer = sendUserMes(messageToSend);
+    socket.emit('message',messageForServer);
 })
 
 
@@ -61,8 +72,8 @@ function sendUserMes(message) {
         message,
         group: presentgroup
     };
-    console.log(userMessage);
-    socket.emit('message', userMessage);
+   // console.log(userMessage);
+    return userMessage;
 
 }
 
@@ -136,25 +147,25 @@ function addingMessages(message) {
         if(message.user_name == username){
         //    console.log("user name is the user's name")
         //   console.log("funtion: displayMessage")
-            userList.push(message.user_name);
+            addUsersToList(message);
             displayMessage(message);
-        //    console.log(userList)
+            console.log(userList)
         } else{
         // console.log("username is not the user's name" + message.user_name);
                 displayOtherUserMessage(message);
-                userList.push(message.user_name);
-            //    console.log(userList);
+                addUsersToList(message);
+                console.log(userList);
         }
         }else if((userList[userList.length - 1] == message.user_name) && (message.user_name == username)){
         //   console.log("funtion displayNextMessage");
             displayNextMessage(message);
-            console.log(userList[userList.length - 1]);
+        //    console.log(userList[userList.length - 1]);
         }
         else if((userList[userList.length - 1] != message.user_name) && (message.user_name != username)){
         //   console.log("function: displayOtherUserMessage");
             displayOtherUserMessage(message);
-            userList.push(message.user_name);
-        //    console.log(userList);
+            addUsersToList(message);
+            console.log(userList);
         }
         else if((userList[userList.length -1] == message.user_name) && (message.user_name != username)){
         //   console.log("function: displayNextOtherUserMessage");
@@ -162,7 +173,8 @@ function addingMessages(message) {
         }else if(userList[userList.length - 1] != message.user_name && message.user_name == username){
         //    console.log("function: displayMessage")
             displayMessage(message);
-            userList.push(message.user_name);
+            addUsersToList(message);
+            console.log(userList);
         }
     }
     }
@@ -177,7 +189,9 @@ function addToLocalStorage(item){
 
 function getItemFromLocalStorage(){
     var finalItem = JSON.parse(localStorage.getItem('cachedMessages'));
+    if(finalItem){
     cacheMessages = finalItem;
+    }
     return finalItem;
 }
 
@@ -187,7 +201,18 @@ function showSavedMessages(){
     console.log("message items in showsaved messages: " + messageItems);
     if(messageItems){
     messageItems.forEach(mesItem => {
+        if(mesItem.group === presentgroup){
         addingMessages(mesItem);
+        }
     })
+    }
+}
+
+function addUsersToList(message){
+    if(userList.length > 2){
+        userList.splice(0,1);
+        userList.push(message.user_name);
+    }else{
+        userList.push(message.user_name);
     }
 }
