@@ -1,5 +1,6 @@
 $primary-color: hsla(218,60%,17%,1);
 $secondary-color: hsla(221,35%,26%,1);
+$other-user-color: rgb(93, 39, 104);
 
 $primary-orange: hsla(24,100%,50%,1);
 $secondary-orange: rgb(255, 137, 58);
@@ -19,13 +20,32 @@ body{
 .chat_body {
     margin-left: 1em;
     color: $text-color;
-    height: 88vh;
+    height: 91vh;
     overflow-y: scroll;
     margin-bottom: 10vh;
+    margin-top: 5vh;
     * + * {
         margin-top: 12px;
     }
     font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.header{
+    font-family: 'Rampart One', cursive;
+    background-color: $primary-color;
+    text-align: center;
+    margin: 0;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    z-index: 10;
+    p{
+        margin: 0;
+        font-size: 1.5em;
+        padding: 0.1em 1em;
+        width: 100%;
+        color: rgb(162, 255, 177);
+    }
 }
 
 .message{
@@ -94,6 +114,7 @@ body{
 .other_user {
     @extend .message;
     clip-path: polygon(100% 0, 96% calc(20% - 1vh), 96% 100%, 0% 100%, 0% 0%);
+    background-color: $other-user-color;
     margin:0;
     margin-top: 12px;
     overflow-x: hidden;

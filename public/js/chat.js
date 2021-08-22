@@ -1,6 +1,6 @@
 const socket = io();
 const chatBox = document.getElementById('chat-box');
-
+const titleBar = document.getElementById('group-name');
 var sendBtn = document.getElementById('send-message');
 var messageInput = document.getElementById('message-item');
 // console.log(location.search);
@@ -23,6 +23,7 @@ for(i = 0; i < namelist.length; i++){
 // console.log(someobject);
 const username = someobject.username;
 const presentgroup = someobject.group;
+titleBar.innerText = presentgroup;
 
 var cacheMessages = [];
 
@@ -32,7 +33,7 @@ var userList = [];
 window.addEventListener('load',showSavedMessages());
 
 
-socket.emit("joinMessage",sendUserMes("user joined"));
+
 
 socket.on("initialmessage",(message) => {
     console.log("Initialmessage received " + message );
@@ -45,7 +46,7 @@ socket.on("serveMessage",(message) => {
     cacheMessages.push(message);
    addingMessages(message);
   // console.log("showing cached message when message comes: " + cacheMessages);
-   if(cacheMessages.length <= 10){
+   if(cacheMessages.length <= 20){
         addToLocalStorage(cacheMessages);
    }else{
        cacheMessages.splice(0,1);
@@ -206,6 +207,7 @@ function showSavedMessages(){
         }
     })
     }
+    socket.emit("joinMessage",sendUserMes("user joined"));
 }
 
 function addUsersToList(message){

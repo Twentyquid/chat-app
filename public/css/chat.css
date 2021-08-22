@@ -11,13 +11,32 @@ body {
 .chat_body {
   margin-left: 1em;
   color: white;
-  height: 88vh;
+  height: 91vh;
   overflow-y: scroll;
   margin-bottom: 10vh;
+  margin-top: 5vh;
   font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 .chat_body * + * {
   margin-top: 12px;
+}
+
+.header {
+  font-family: "Rampart One", cursive;
+  background-color: #112445;
+  text-align: center;
+  margin: 0;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  z-index: 10;
+}
+.header p {
+  margin: 0;
+  font-size: 1.5em;
+  padding: 0.1em 1em;
+  width: 100%;
+  color: #a2ffb1;
 }
 
 .message, .other_user, .other_next_message {
@@ -84,6 +103,7 @@ body {
 
 .other_user, .other_next_message {
   clip-path: polygon(100% 0, 96% calc(20% - 1vh), 96% 100%, 0% 100%, 0% 0%);
+  background-color: #5d2768;
   margin: 0;
   margin-top: 12px;
   overflow-x: hidden;
